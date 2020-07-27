@@ -1,5 +1,7 @@
 # A Tetris clone
-Made using p5js in a few hours.
+Made using p5js over the span of a few days.
+
+![Tetris](./TetriDemo.png)
 
 Made mostly for my own entertainment, expect nothing good
 
@@ -11,7 +13,7 @@ Made mostly for my own entertainment, expect nothing good
 - [x] Proper tetris spawning
 - [x] INTERMISSION: UI Sprucing up with html(Meh good enough 4 now)
 - [x] Pause
-- [ ] More intermission: Demo screen for github swag
+- [x] More intermission: Demo screen for github swag
 - [ ] Next box
 - [ ] Hold functionality
 - [ ] Smarter rotation

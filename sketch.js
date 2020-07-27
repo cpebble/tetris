@@ -17,14 +17,14 @@ let pieceBag = [];
 const gutterWidth = 2;
 const blockWidth = 48;
 const colors = {
-    0: "#FFFFFF",
-    1: "cyan", // I
-    2: "blue", // J
-    3: "orange", // L
-    4: "yellow", // O
-    5: "green", // S
-    6: "purple", // T
-    7: "red" // Z
+    0: "#ffffff",
+    1: "#01ffff", // I
+    2: "#0000ff", // J
+    3: "#feaa00", // L
+    4: "#ffff00", // O
+    5: "#00ff03", // S
+    6: "#9900fe", // T
+    7: "#ff0100", // Z
 }
 const controls = {
     "left": 65,
