@@ -9,10 +9,11 @@ Made mostly for my own entertainment, expect nothing good
 - [x] Basic rotation
 - [x] Points and clearing lines
 - [x] Proper tetris spawning
-- [ ] INTERMISSION: UI Sprucing up with html
+- [x] INTERMISSION: UI Sprucing up with html(Meh good enough 4 now)
+- [x] Pause
+- [ ] More intermission: Demo screen for github swag
 - [ ] Next box
 - [ ] Hold functionality
-- [ ] Pause
 - [ ] Smarter rotation
 - [ ] Win/lose screens
 

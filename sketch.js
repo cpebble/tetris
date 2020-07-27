@@ -36,10 +36,12 @@ const controls = {
 
 /// Spawn the canvas and init the grid to size
 function setup() {
-    cnv = createCanvas(windowWidth, windowHeight)
+    let maxWidth = columns*blockWidth;
+    let maxHeight = rows*blockWidth
+    cnv = createCanvas(maxWidth, maxHeight);
     cnv.style("display", "block");
     // cnv.style("position", "absolute");
-    cnv.parent("body")
+    cnv.parent("tetris-container");
     for (let r = 0; r < rows; r++) {
         grid.push([]);
         for (let c = 0; c < columns; c++) {
@@ -61,7 +63,6 @@ function draw() {
         updateGame();
     }
     // Draw game board
-    translate(blockWidth, blockWidth)
     drawBlocks()
     drawGrid()
     drawCurrent();
@@ -182,6 +183,7 @@ function checkClearedLines(){
         }
         score += 10;
     });
+    updateScore(score);
 }
 
 /// Gimme a new random piece and init the current object
@@ -271,7 +273,7 @@ function keyPressed(){
         paused = !paused;
 }
 
-function windowResized() {
-    // Just in case i encounter drawing issues with small -> large screen
-    resizeCanvas(windowWidth, windowHeight);
-}
+// function windowResized() {
+//     // Just in case i encounter drawing issues with small -> large screen
+//     resizeCanvas(windowWidth, windowHeight);
+// }

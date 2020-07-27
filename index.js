@@ -7,3 +7,7 @@
 //     moveTimer = window.setInterval(updateMove, moveTick);
 // });
 
+function updateScore(newScore)
+{
+    document.getElementById("scorebox").innerText = newScore;
+}
