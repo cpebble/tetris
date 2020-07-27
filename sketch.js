@@ -12,6 +12,7 @@ let nextMoveUpdate = moveTick;
 // Game stuff
 let paused = false;
 let score = 0;
+let pieceBag = [];
 // Drawing consts
 const gutterWidth = 2;
 const blockWidth = 48;
@@ -186,11 +187,25 @@ function checkClearedLines(){
 /// Gimme a new random piece and init the current object
 function nextPiece() {
     //TODO: Use proper piece spawning
-    let newPiece = Math.ceil(Math.random() * 7)
+    let newPiece = getFromBag();
     current.x = 2;
     current.y = 0;
     current.rotation = 0;
     current.type = newPiece;
+}
+/// These two manage the random bag
+function getFromBag() {
+    if (pieceBag.length <= 4)
+    {
+        fillBag();
+    }
+    return pieceBag.shift();
+}
+function fillBag() {
+    let newBag = shuffle([1,2,3,4,5,6,7]);
+    newBag.forEach(t=>{
+        pieceBag.push(t);
+    });
 }
 /// This is a simple check for moving the piece
 function updateMove() {
