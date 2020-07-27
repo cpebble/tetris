@@ -8,10 +8,12 @@ Made mostly for my own entertainment, expect nothing good
 - [x] Movement
 - [x] Basic rotation
 - [ ] Points and clearing lines
-- [ ] Smarter rotation
-- [ ] Win/lose screens
+- [ ] Proper tetris spawning
 - [ ] Next box
 - [ ] Hold functionality
+- [ ] Pause
+- [ ] Smarter rotation
+- [ ] Win/lose screens
 
 I might not implement any of the above, or i might refactor this list entirely
 

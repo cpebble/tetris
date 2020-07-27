@@ -28,6 +28,8 @@ const controls = {
     "down": 83,
     "rotate": 87
 }
+
+/// Spawn the canvas and init the grid to size
 function setup() {
     cnv = createCanvas(windowWidth, windowHeight)
     cnv.style("display", "block");
@@ -40,6 +42,7 @@ function setup() {
         }
     }
 }
+/// Handles running game-updates and drawing. 
 function draw() {
     // Check for updates
     if (millis() > nextMoveUpdate)
@@ -58,40 +61,59 @@ function draw() {
     drawGrid()
     drawCurrent();
 }
+/// The function that updates the game logic, Handles movement and checks lines
 function updateGame() {
+    // Check if we can move the piece down
     let canMoveDown = tryMoveDown()
     if (canMoveDown)
     {
+        // Increase y, don't need to do anything else really
+        // Will probably run 80% of all updates so keep it light
         current.y += 1;
     }
     else {
-        console.log("cantMove")
+        // Record the placement
         addToGrid();
+        // Check for cleared lines here
+        //TODO: This
+        // Then generate the new piece from sack
         nextPiece();
+        
     }
 }
+/// Helper function to handle rotation <3
 function getCurrentShape (){return shapes[current.type][current.rotation]}
+/// Checks if we have reached the end of a shapes drop
 function tryMoveDown() {
-    // return true;
+    // We need to know which blocks to check
     let s = getCurrentShape()
+    // 2D Iteration of the shape
     for (let r = 0; r < s.length; r++) {
         for (let c = 0; c < s.length; c++) {
+            // If the block isn't "Solid" we don't really care to check it
             if (s[r][c] == 1){
+                // And thus goes the biggest memory sink/stupid hack i wrote
+                // To handle rotation
+
+                // Translate coords local->world
                 let c_ = current.x+c
                 let r_ = current.y+r
                 try {
+                    // And check for solids
                     if (grid[r_ + 1][c_] != 0)
                         return false;
                 } catch (error) {
+                    // IndexErrors mean oob. Catches hitting the bottom and/or glitching oob
                     return false;
                 }
             }
         }
     }
+    // If no blocks hold collisions, we are able to move down
     return true;
 }
+/// This basically does the same as tryMoveDown, see for comments
 function tryMoveHorizontal(dir) {
-    // return true;
     let s = getCurrentShape()
     for (let r = 0; r < s.length; r++) {
         for (let c = 0; c < s.length; c++) {
@@ -109,7 +131,9 @@ function tryMoveHorizontal(dir) {
     }
     return true;
 }
+/// Log the current shape to grid. Is called after moving down
 function addToGrid() {
+    // This uses the same 2d iteration as the tryMoves with a simpler body
     let s = getCurrentShape()
     for (let r = 0; r < s.length; r++) {
         for (let c = 0; c < s[0].length; c++) {
@@ -122,49 +146,63 @@ function addToGrid() {
     }
 }
 
+/// Gimme a new random piece and init the current object
 function nextPiece() {
+    //TODO: Use proper piece spawning
     let newPiece = Math.ceil(Math.random() * 7)
     current.x = 2;
     current.y = 0;
     current.rotation = 0;
     current.type = newPiece;
 }
+/// This is a simple check for moving the piece
 function updateMove() {
-    // Check move left
+    // We check if the key is down AND the move is legal, then move that dir
     if (keyIsDown(controls.left) && tryMoveHorizontal(-1))
         current.x -= 1;
     if (keyIsDown(controls.right) && tryMoveHorizontal(1))
         current.x += 1;
+    // Rotate is slightly more complex move, so wrap that in a seperate func
     if (keyIsDown(controls.rotate))
         rotateCurrent()
+    // This is basically a soft drop, but i'll get back to it
     if (keyIsDown(controls.down) && tryMoveDown())
         current.y += 1;
 }
 
+/// Ok, right now it isn't that complex
 function rotateCurrent()
 {
+    // Improve you Simp
     current.rotation = (current.rotation + 1) % 4;
 }
 
+/// Draw the grid as an overlay. Without this tetris looks weird o.O
 function drawGrid(){
+    // We use a thick gray-outlined box
     noFill()
     stroke("gray");
     strokeWeight(gutterWidth)
+    // Standard rectangle grid drawing
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
             rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth )
         }
     }
 }
+/// Draw the placed blocks
 function drawBlocks(){
+    // This time we use a filled block, with the 
     noStroke();
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
+            // Could be slightly improved to account for all the redraws of white blocks
             fill(colors[grid[r][c]]);
-            rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth )
+            rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth)
         }
     }
 }
+/// Draw the current shape
 function drawCurrent(){
     fill(colors[current.type])
     let s = getCurrentShape()
@@ -176,9 +214,7 @@ function drawCurrent(){
     }
 }
 
-function mousePressed() {
-    // spawn_circle(mouseX, mouseY, 50);
-}
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+    // Just in case i encounter drawing issues with small -> large screen
+    resizeCanvas(windowWidth, windowHeight);
 }
