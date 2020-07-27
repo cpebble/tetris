@@ -9,6 +9,9 @@ const gameTick = 500;
 const moveTick = gameTick / 3;
 let nextGameUpdate = gameTick;
 let nextMoveUpdate = moveTick;
+// Game stuff
+let paused = false;
+let score = 0;
 // Drawing consts
 const gutterWidth = 2;
 const blockWidth = 48;
@@ -26,7 +29,8 @@ const controls = {
     "left": 65,
     "right": 68,
     "down": 83,
-    "rotate": 87
+    "rotate": 87,
+    "pause": 8
 }
 
 /// Spawn the canvas and init the grid to size
@@ -45,12 +49,12 @@ function setup() {
 /// Handles running game-updates and drawing. 
 function draw() {
     // Check for updates
-    if (millis() > nextMoveUpdate)
+    if (!paused && millis() > nextMoveUpdate)
     {
         nextMoveUpdate = millis() + moveTick;
         updateMove();
     }
-    if (millis() > nextGameUpdate)
+    if (!paused && millis() > nextGameUpdate)
     {
         nextGameUpdate = millis() + gameTick;
         updateGame();
@@ -75,7 +79,7 @@ function updateGame() {
         // Record the placement
         addToGrid();
         // Check for cleared lines here
-        //TODO: This
+        checkClearedLines();
         // Then generate the new piece from sack
         nextPiece();
         
@@ -146,6 +150,39 @@ function addToGrid() {
     }
 }
 
+/// Function check rows for, and remove cleared lines
+function checkClearedLines(){
+    // Check top-down and collect lines to remove
+    let toRemove = [];
+    for (let r = 0; r < grid.length; r++)
+    {
+        let clear = true;
+        for (let c = 0; c < grid[0].length; c++)
+        {
+            if (grid[r][c] == 0){
+                clear = false;
+                break
+            }
+        }
+        if (clear)
+            toRemove.push(r)
+    }
+    // Now remove those and push down
+    // Runs in $O(\infty)$
+    toRemove.reverse().forEach((i)=>
+    {
+        console.log(toRemove.reverse()[i])
+        for (let r = i; r > 0; r--)
+        {
+            for (let c = 0; c < grid[0].length; c++)
+            {
+                grid[r][c] = grid[r-1][c]
+            }
+        }
+        score += 10;
+    });
+}
+
 /// Gimme a new random piece and init the current object
 function nextPiece() {
     //TODO: Use proper piece spawning
@@ -212,6 +249,11 @@ function drawCurrent(){
                 rect((current.x+c)*blockWidth, (current.y+r)*blockWidth, blockWidth, blockWidth )
         }
     }
+}
+
+function keyPressed(){
+    if (keyCode == controls.pause)
+        paused = !paused;
 }
 
 function windowResized() {

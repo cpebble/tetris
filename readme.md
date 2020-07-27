@@ -7,7 +7,7 @@ Made mostly for my own entertainment, expect nothing good
 - [x] Drawing blocks and grid
 - [x] Movement
 - [x] Basic rotation
-- [ ] Points and clearing lines
+- [x] Points and clearing lines
 - [ ] Proper tetris spawning
 - [ ] Next box
 - [ ] Hold functionality
