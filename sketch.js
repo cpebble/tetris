@@ -69,6 +69,9 @@ function draw() {
 }
 /// The function that updates the game logic, Handles movement and checks lines
 function updateGame() {
+    // Check top-out
+    let lost = checkLossCond();
+    if (lost) lose();
     // Check if we can move the piece down
     let canMoveDown = tryMoveDown()
     if (canMoveDown)
@@ -86,6 +89,10 @@ function updateGame() {
         nextPiece();
         
     }
+}
+function lose(){
+    paused = true;
+    alert("you died")
 }
 /// Helper function to handle rotation <3
 function getCurrentShape (){return shapes[current.type][current.rotation]}
@@ -118,6 +125,7 @@ function tryMoveDown() {
     // If no blocks hold collisions, we are able to move down
     return true;
 }
+
 /// This basically does the same as tryMoveDown, see for comments
 function tryMoveHorizontal(dir) {
     let s = getCurrentShape()
@@ -209,6 +217,26 @@ function fillBag() {
         pieceBag.push(t);
     });
 }
+
+function checkLossCond() {
+    // First check if current piece overlaps with game-board
+    let s = getCurrentShape();
+    for(let r = 0; r < s.length; r++)
+    {
+        for (let c = 0; c < s[0].length; c++) {
+            const element = s[0][c];
+            if (element != 0 && grid[r+current.y][c+current.x] != 0)
+            {
+                console.log("collision on new piece spawned: "+(r+current.y)
+                +", "+ (c+current.x)+" with value "+ grid[r+current.y][c+current.x]);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
 /// This is a simple check for moving the piece
 function updateMove() {
     // We check if the key is down AND the move is legal, then move that dir

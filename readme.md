@@ -14,6 +14,7 @@ Made mostly for my own entertainment, expect nothing good
 - [x] INTERMISSION: UI Sprucing up with html(Meh good enough 4 now)
 - [x] Pause
 - [x] More intermission: Demo screen for github swag
+- [x] Lose condition and basic warning
 - [ ] Next box
 - [ ] Hold functionality
 - [ ] Smarter rotation
