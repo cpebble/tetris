@@ -25,3 +25,18 @@ h2 {
   border: 2px solid gray;
   margin-left: 50px;
 }
+#nextBox::before{
+  content: "Next Box";
+  font-size: x-large;
+  font-weight: bold;
+  /* font-family: sans-serif; */
+}
+#nextBox {
+  margin: 40px;
+  display: inline;
+  padding: 15px;
+}
+#nextBox > canvas {
+  position: relative;
+  left: 30px;
+}

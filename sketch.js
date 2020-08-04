@@ -13,6 +13,7 @@ let nextMoveUpdate = moveTick;
 let paused = false;
 let score = 0;
 let pieceBag = [];
+let lostGame = false;
 // Drawing consts
 const gutterWidth = 2;
 const blockWidth = 48;
@@ -33,12 +34,16 @@ const controls = {
     "rotate": 87,
     "pause": 8
 }
-
+let Sketch = function(sk) {
+    sk.setup = ()=>{Setup(sk)}
+    sk.draw = ()=>{Draw(sk)}
+    sk.keyPressed = ()=>{KeyPressed(sk)}
+}
 /// Spawn the canvas and init the grid to size
-function setup() {
+function Setup(sk) {
     let maxWidth = columns*blockWidth;
     let maxHeight = rows*blockWidth
-    cnv = createCanvas(maxWidth, maxHeight);
+    cnv = sk.createCanvas(maxWidth, maxHeight);
     cnv.style("display", "block");
     // cnv.style("position", "absolute");
     cnv.parent("tetris-container");
@@ -48,30 +53,31 @@ function setup() {
             grid[r].push(0);
         }
     }
+    fillBag();
 }
 /// Handles running game-updates and drawing. 
-function draw() {
+function Draw(sk) {
     // Check for updates
-    if (!paused && millis() > nextMoveUpdate)
+    if (!paused && sk.millis() > nextMoveUpdate)
     {
-        nextMoveUpdate = millis() + moveTick;
-        updateMove();
+        nextMoveUpdate = sk.millis() + moveTick;
+        updateMove(sk);
     }
-    if (!paused && millis() > nextGameUpdate)
+    if (!paused && sk.millis() > nextGameUpdate)
     {
-        nextGameUpdate = millis() + gameTick;
-        updateGame();
+        nextGameUpdate = sk.millis() + gameTick;
+        updateGame(sk);
     }
     // Draw game board
-    drawBlocks()
-    drawGrid()
-    drawCurrent();
+    drawBlocks(sk);
+    drawGrid(sk);
+    drawCurrent(sk);
 }
 /// The function that updates the game logic, Handles movement and checks lines
-function updateGame() {
+function updateGame(sk) {
     // Check top-out
     let lost = checkLossCond();
-    if (lost) lose();
+    if (lost) {lose(); return;}
     // Check if we can move the piece down
     let canMoveDown = tryMoveDown()
     if (canMoveDown)
@@ -87,10 +93,10 @@ function updateGame() {
         checkClearedLines();
         // Then generate the new piece from sack
         nextPiece();
-        
     }
 }
 function lose(){
+    lost = true;
     paused = true;
     alert("you died")
 }
@@ -134,7 +140,11 @@ function tryMoveHorizontal(dir) {
             if (s[r][c] == 1){
                 let c_ = current.x+c
                 let r_ = current.y+r
+                // OOB check
+                if (c_ < 0 || c_ >= columns)
+                    return false;
                 try {
+                    // OCC check
                     if (grid[r_][c_+dir] != 0)
                         return false;
                 } catch (error) {
@@ -212,8 +222,21 @@ function getFromBag() {
     return pieceBag.shift();
 }
 function fillBag() {
-    let newBag = shuffle([1,2,3,4,5,6,7]);
-    newBag.forEach(t=>{
+    let arra1 = [1,2,3,4,5,6,7];
+    var ctr = arra1.length, temp, index;
+
+    // While there are elements in the array
+    while (ctr > 0) {
+        // Pick a random index
+        index = Math.floor(Math.random() * ctr);
+        // Decrease ctr by 1
+        ctr--;
+        // And swap the last element with it
+        temp = arra1[ctr];
+        arra1[ctr] = arra1[index];
+        arra1[index] = temp;
+    }
+    arra1.forEach(t=>{
         pieceBag.push(t);
     });
 }
@@ -224,7 +247,7 @@ function checkLossCond() {
     for(let r = 0; r < s.length; r++)
     {
         for (let c = 0; c < s[0].length; c++) {
-            const element = s[0][c];
+            const element = s[r][c];
             if (element != 0 && grid[r+current.y][c+current.x] != 0)
             {
                 console.log("collision on new piece spawned: "+(r+current.y)
@@ -238,66 +261,77 @@ function checkLossCond() {
 
 
 /// This is a simple check for moving the piece
-function updateMove() {
+function updateMove(sk) {
     // We check if the key is down AND the move is legal, then move that dir
-    if (keyIsDown(controls.left) && tryMoveHorizontal(-1))
+    if (sk.keyIsDown(controls.left) && tryMoveHorizontal(-1))
         current.x -= 1;
-    if (keyIsDown(controls.right) && tryMoveHorizontal(1))
+    if (sk.keyIsDown(controls.right) && tryMoveHorizontal(1))
         current.x += 1;
     // Rotate is slightly more complex move, so wrap that in a seperate func
-    if (keyIsDown(controls.rotate))
+    if (sk.keyIsDown(controls.rotate))
         rotateCurrent()
     // This is basically a soft drop, but i'll get back to it
-    if (keyIsDown(controls.down) && tryMoveDown())
+    if (sk.keyIsDown(controls.down) && tryMoveDown())
         current.y += 1;
+    
+    nextMoveUpdate = sk.millis() + moveTick;
 }
 
 /// Ok, right now it isn't that complex
 function rotateCurrent()
 {
-    // Improve you Simp
+    // Update rotation
+    let old = current.rotation;
     current.rotation = (current.rotation + 1) % 4;
+    // Check if shape overlaps
+    let canMove = tryMoveHorizontal(0); // Checks oob and collisions so good enough
+    if (!canMove)
+        current.rotation = old;
+
 }
 
 /// Draw the grid as an overlay. Without this tetris looks weird o.O
-function drawGrid(){
+function drawGrid(sk){
     // We use a thick gray-outlined box
-    noFill()
-    stroke("gray");
-    strokeWeight(gutterWidth)
+    sk.noFill()
+    sk.stroke("gray");
+    sk.strokeWeight(gutterWidth)
     // Standard rectangle grid drawing
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
-            rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth )
+            sk.rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth )
         }
     }
 }
 /// Draw the placed blocks
-function drawBlocks(){
+function drawBlocks(sk){
     // This time we use a filled block, with the 
-    noStroke();
+    sk.noStroke();
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
             // Could be slightly improved to account for all the redraws of white blocks
-            fill(colors[grid[r][c]]);
-            rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth)
+            sk.fill(colors[grid[r][c]]);
+            sk.rect(c*blockWidth, r*blockWidth, blockWidth, blockWidth)
         }
     }
 }
 /// Draw the current shape
-function drawCurrent(){
-    fill(colors[current.type])
+function drawCurrent(sk){
+    sk.fill(colors[current.type])
     let s = getCurrentShape()
     for (let r = 0; r < s.length; r++) {
         for (let c = 0; c < s.length; c++) {
             if (s[r][c] == 1)
-                rect((current.x+c)*blockWidth, (current.y+r)*blockWidth, blockWidth, blockWidth )
+                sk.rect((current.x+c)*blockWidth, (current.y+r)*blockWidth, blockWidth, blockWidth )
         }
     }
 }
 
-function keyPressed(){
-    if (keyCode == controls.pause)
+function KeyPressed(sk){
+    if (!paused)
+        updateMove(sk);
+
+    if (sk.keyCode == controls.pause)
         paused = !paused;
 }
 
@@ -305,3 +339,4 @@ function keyPressed(){
 //     // Just in case i encounter drawing issues with small -> large screen
 //     resizeCanvas(windowWidth, windowHeight);
 // }
+new p5(Sketch);

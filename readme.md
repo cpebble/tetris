@@ -15,10 +15,11 @@ Made mostly for my own entertainment, expect nothing good
 - [x] Pause
 - [x] More intermission: Demo screen for github swag
 - [x] Lose condition and basic warning
-- [ ] Next box
+- [x] Next box
 - [ ] Hold functionality
 - [ ] Smarter rotation
 - [ ] Win/lose screens
+- [ ] Better ui and rethink colors
 
 I might not implement any of the above, or i might refactor this list entirely
 
